@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    ports:
+      - "54321:5432"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: polarizometro
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - db_network
+
+  flask_api:
+    image: polarizometro/polarizometro-backend-flask:latest
+    container_name: flask_api
+    restart: always
+    env_file: .env
+    depends_on:
+      - db
+    networks:
+      - db_network
+      - web_network
+
+  react_frontend:
+    container_name: react-berry
+    image: polarizometro/react-frontend:latest
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - SKIP_PREFLIGHT_CHECK=true
+    networks:
+      - web_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    networks:
+      - web_network
+    depends_on: 
+      - flask_api
+
+networks:
+  db_network:
+    driver: bridge
+  web_network:
+    driver: bridge
