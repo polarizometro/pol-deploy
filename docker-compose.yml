@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:latest
-    container_name: db
+    container_name: polarizometro-db
     restart: always
     ports:
       - "54321:5432"
@@ -18,7 +18,7 @@ services:
 
   flask_api:
     image: polarizometro/polarizometro-backend-flask:latest
-    container_name: flask_api
+    container_name: polarizometro-flask-api
     restart: always
     env_file: .env
     depends_on:
@@ -28,7 +28,7 @@ services:
       - web_network
 
   react_frontend:
-    container_name: react-berry
+    container_name: polarizometro-react-frontend
     image: polarizometro/react-frontend:latest
     ports:
       - 3000:3000
@@ -40,7 +40,7 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: polarizometro-nginx
     restart: always
     ports:
       - "5001:5000"
